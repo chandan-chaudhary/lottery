@@ -6,20 +6,35 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "copy-abi": "cp ./ignition/deployments/chain-11155111/artifacts/LotteryModule#Lottery.json ./app/lib/Lottery.json"
   },
   "dependencies": {
     "@chainlink/contracts": "^1.4.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@tailwindcss/postcss": "^4.1.14",
+    "@tanstack/react-query": "^5.90.5",
+    "autoprefixer": "^10.4.21",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
+    "lucide-react": "^0.546.0",
     "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-hot-toast": "^2.6.0",
+    "shadcn-ui": "^0.9.5",
+    "tailwind-merge": "^3.3.1",
+    "viem": "^2.38.3",
+    "wagmi": "^2.18.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@nomicfoundation/hardhat-ignition": "^3.0.3",
     "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.0",
-    "@tailwindcss/postcss": "^4",
+    "@nomicfoundation/hardhat-verify": "^3.0.3",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^4.3.20",
     "@types/chai-as-promised": "^8.0.2",
     "@types/mocha": "^10.0.10",
@@ -33,7 +48,9 @@
     "forge-std": "github:foundry-rs/forge-std#v1.9.4",
     "hardhat": "^3.0.6",
     "mocha": "^11.7.4",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.14",
+    "tw-animate-css": "^1.4.0",
+    "typechain": "^8.3.2",
     "typescript": "~5.8.0"
   },
   "type": "module"

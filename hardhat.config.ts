@@ -2,6 +2,7 @@ import type { HardhatUserConfig } from "hardhat/config";
 import hardhatToolboxMochaEthersPlugin from "@nomicfoundation/hardhat-toolbox-mocha-ethers";
 import "@nomicfoundation/hardhat-verify";
 import dotenv from "dotenv";
+import "@typechain/hardhat";
 
 dotenv.config();
 
