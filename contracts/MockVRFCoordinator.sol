@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+interface IVRFConsumer {
+    function rawFulfillRandomWords(
+        uint256 requestId,
+        uint256[] memory randomWords
+    ) external;
+}
 /**
  * Mock VRF Coordinator for Local Testing
  * This contract simulates Chainlink VRF functionality for testing purposes
@@ -50,19 +56,26 @@ contract MockVRFCoordinator {
      * Helper function to manually fulfill random words (for testing)
      * In production, Chainlink VRF would call this
      */
+    // function fulfillRandomWords(
+    //     uint256 requestId,
+    //     address consumer,
+    //     uint256[] memory randomWords
+    // ) external {
+    //     // Call the consumer's fulfillRandomWords function
+    //     (bool success, ) = consumer.call(
+    //         abi.encodeWithSignature(
+    //             "rawFulfillRandomWords(uint256,uint256[])",
+    //             requestId,
+    //             randomWords
+    //         )
+    //     );
+    //     require(success, "Fulfillment failed");
+    // }
     function fulfillRandomWords(
         uint256 requestId,
         address consumer,
         uint256[] memory randomWords
     ) external {
-        // Call the consumer's fulfillRandomWords function
-        (bool success, ) = consumer.call(
-            abi.encodeWithSignature(
-                "rawFulfillRandomWords(uint256,uint256[])",
-                requestId,
-                randomWords
-            )
-        );
-        require(success, "Fulfillment failed");
+        IVRFConsumer(consumer).rawFulfillRandomWords(requestId, randomWords);
     }
 }

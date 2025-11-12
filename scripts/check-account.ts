@@ -1,6 +1,4 @@
-import { network } from "hardhat";
-
-const { ethers } = await network.connect();
+import { ethers } from "hardhat";
 
 async function main() {
   console.log("Checking environment variables...");

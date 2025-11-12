@@ -66,7 +66,7 @@ const LotteryModule = buildModule("LotteryModule", (m) => {
    */
   const keyHash = m.getParameter(
     "keyHash",
-    "0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae" // Sepolia 500 gwei
+    "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c" // Sepolia 150 gwei
   );
 
   /**
@@ -84,7 +84,7 @@ const LotteryModule = buildModule("LotteryModule", (m) => {
    */
   const callbackGasLimit = m.getParameter(
     "callbackGasLimit",
-    100000 // 100k gas
+    500000 // 100k gas
   );
 
   /**
@@ -100,7 +100,7 @@ const LotteryModule = buildModule("LotteryModule", (m) => {
    */
   const interval = m.getParameter(
     "interval",
-    100 // 100 seconds
+    120 // 120 seconds
   );
 
   // ========================================

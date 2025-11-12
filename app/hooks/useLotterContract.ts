@@ -29,20 +29,53 @@ export function useLotteryContract() {
   }, [contract]);
 
   const getTotalPlayers = useCallback(async () => {
-    const players = await contract.getNoOfPlayer();
+    const players = await contract.getNumberOfPlayers();
     return Number(players);
   }, [contract]);
 
+  const getListOfPlayers = useCallback(async () => {
+    const players = await contract.getPlayers();
+    return players.map((player) => ({
+      address: player,
+      entries: 1, // Default to 1 entry per player
+    }));
+  }, [contract]);
   const getLastWinner = useCallback(async () => {
     return await contract.getRecentWinner();
   }, [contract]);
 
   const getLotteryState = useCallback(async () => {
-    return Number(await contract.lotteryState());
+    return Number(await contract.getLotteryState());
   }, [contract]);
 
   const getLastTimeStamp = useCallback(async () => {
     return await contract.getLastTimeStamp();
+  }, [contract]);
+
+  // New functions added
+  const getAllRecentWinners = useCallback(async () => {
+    return await contract.getAllRecentWinners();
+  }, [contract]);
+
+  const getInterval = useCallback(async () => {
+    return await contract.getInterval();
+  }, [contract]);
+
+  const getContractBalance = useCallback(async () => {
+    const balance = await contract.getContractBalance();
+    return Number(balance) / 1e18;
+  }, [contract]);
+
+  const getNumWords = useCallback(async () => {
+    return Number(await contract.getNumWords());
+  }, [contract]);
+
+  const getRequestConfirmations = useCallback(async () => {
+    return Number(await contract.getRequestConfirmations());
+  }, [contract]);
+
+  const getOwner = useCallback(async () => {
+    return await contract.owner();
   }, [contract]);
 
   // Add more contract functions as needed
@@ -77,12 +110,110 @@ export function useLotteryContract() {
     []
   );
 
+  // Owner function: Change owner
+  const changeOwner = useCallback(
+    async (signer: ethers.Signer, newOwner: string) => {
+      try {
+        const contractWithSigner = Lottery__factory.connect(
+          LOTTERY_ADDRESS,
+          signer
+        );
+        const tx = await contractWithSigner.changeOwner(newOwner);
+        const receipt = await tx.wait();
+        return receipt;
+      } catch (err) {
+        const e = err as { code?: number; message?: string } | undefined;
+        if (e?.code === 4001) {
+          throw new Error("Transaction rejected by user");
+        }
+        throw err;
+      }
+    },
+    []
+  );
+
+  // Owner function: Emergency withdraw all funds
+  const emergencyWithdraw = useCallback(async (signer: ethers.Signer) => {
+    try {
+      const contractWithSigner = Lottery__factory.connect(
+        LOTTERY_ADDRESS,
+        signer
+      );
+      const tx = await contractWithSigner.emergencyWithdraw();
+      const receipt = await tx.wait();
+      return receipt;
+    } catch (err) {
+      const e = err as { code?: number; message?: string } | undefined;
+      if (e?.code === 4001) {
+        throw new Error("Transaction rejected by user");
+      }
+      throw err;
+    }
+  }, []);
+
+  // Owner function: Set interval
+  const setInterval = useCallback(
+    async (signer: ethers.Signer, newInterval: ethers.BigNumberish) => {
+      try {
+        const contractWithSigner = Lottery__factory.connect(
+          LOTTERY_ADDRESS,
+          signer
+        );
+        const tx = await contractWithSigner.setInterval(newInterval);
+        const receipt = await tx.wait();
+        return receipt;
+      } catch (err) {
+        const e = err as { code?: number; message?: string } | undefined;
+        if (e?.code === 4001) {
+          throw new Error("Transaction rejected by user");
+        }
+        throw err;
+      }
+    },
+    []
+  );
+
+  // Owner function: Set lottery entry fee
+  const setLotteryEntryFee = useCallback(
+    async (signer: ethers.Signer, newFee: ethers.BigNumberish) => {
+      try {
+        const contractWithSigner = Lottery__factory.connect(
+          LOTTERY_ADDRESS,
+          signer
+        );
+        const tx = await contractWithSigner.setLotteryEntryFee(newFee);
+        const receipt = await tx.wait();
+        return receipt;
+      } catch (err) {
+        const e = err as { code?: number; message?: string } | undefined;
+        if (e?.code === 4001) {
+          throw new Error("Transaction rejected by user");
+        }
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     getEntryFee,
     getTotalPlayers,
     getLastWinner,
     getLotteryState,
     getLastTimeStamp,
+    getListOfPlayers,
     enterLottery,
+    // New functions
+    getAllRecentWinners,
+    getInterval,
+    getContractBalance,
+    getNumWords,
+    getRequestConfirmations,
+    getOwner,
+    // Owner write functions
+    changeOwner,
+    emergencyWithdraw,
+    setInterval,
+    setLotteryEntryFee,
   };
 }

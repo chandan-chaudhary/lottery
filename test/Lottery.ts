@@ -1,17 +1,17 @@
 import { expect } from "chai";
-import { network } from "hardhat";
+import hre from "hardhat";
 import { parseEther } from "ethers";
 
-const { ethers } = await network.connect();
+const { ethers } = hre;
 
 describe("Lottery Contract", function () {
   // Test configuration - matches your contract requirements
   const ENTRY_FEE = parseEther("0.01"); // 0.01 ETH
   const SUBSCRIPTION_ID = BigInt(1); // Mock subscription ID for testing
   const KEY_HASH =
-    "0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae";
+    "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c";
   const CALLBACK_GAS_LIMIT = 100000;
-  const INTERVAL = 300; // 5 minutes in seconds
+  const INTERVAL = 30; // 1 minute in seconds
 
   // We'll use a mock VRF Coordinator for local testing
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,12 +76,12 @@ describe("Lottery Contract", function () {
     });
 
     it("Should start in OPEN state", async function () {
-      const state = await lottery.lotteryState();
+      const state = await lottery.getLotteryState();
       expect(state).to.equal(0); // 0 = OPEN
     });
 
     it("Should have no players initially", async function () {
-      const numPlayers = await lottery.getNoOfPlayer();
+      const numPlayers = await lottery.getNumberOfPlayers();
       expect(numPlayers).to.equal(0);
     });
 
@@ -103,7 +103,7 @@ describe("Lottery Contract", function () {
         .enterLottery({ value: ENTRY_FEE });
       await tx.wait();
 
-      const numPlayers = await lottery.getNoOfPlayer();
+      const numPlayers = await lottery.getNumberOfPlayers();
       expect(numPlayers).to.equal(1);
     });
 
@@ -118,7 +118,7 @@ describe("Lottery Contract", function () {
 
       await expect(
         lottery.connect(player1).enterLottery({ value: insufficientFee })
-      ).to.be.revertedWith("Not enough ETH to enter lottery");
+      ).to.be.revertedWithCustomError(lottery, "NotEnoughETH");
     });
 
     it("Should allow multiple users to enter", async function () {
@@ -131,7 +131,7 @@ describe("Lottery Contract", function () {
       // Player 3 enters
       await lottery.connect(player3).enterLottery({ value: ENTRY_FEE });
 
-      const numPlayers = await lottery.getNoOfPlayer();
+      const numPlayers = await lottery.getNumberOfPlayers();
       expect(numPlayers).to.equal(3);
     });
 
@@ -149,7 +149,7 @@ describe("Lottery Contract", function () {
 
       await lottery.connect(player1).enterLottery({ value: higherFee });
 
-      const numPlayers = await lottery.getNoOfPlayer();
+      const numPlayers = await lottery.getNumberOfPlayers();
       expect(numPlayers).to.equal(1);
     });
 
@@ -176,7 +176,7 @@ describe("Lottery Contract", function () {
       await lottery.connect(player1).enterLottery({ value: ENTRY_FEE });
       await lottery.connect(player2).enterLottery({ value: ENTRY_FEE });
 
-      expect(await lottery.getNoOfPlayer()).to.equal(2);
+      expect(await lottery.getNumberOfPlayers()).to.equal(2);
     });
 
     it("Should return all players", async function () {
@@ -240,11 +240,11 @@ describe("Lottery Contract", function () {
 
       // Try to enter - should work
       await lottery.connect(player2).enterLottery({ value: ENTRY_FEE });
-      expect(await lottery.getNoOfPlayer()).to.equal(2);
+      expect(await lottery.getNumberOfPlayers()).to.equal(2);
     });
 
     it("Should return correct lottery state", async function () {
-      const state = await lottery.lotteryState();
+      const state = await lottery.getLotteryState();
       expect(state).to.equal(0); // OPEN = 0
     });
   });
@@ -257,7 +257,7 @@ describe("Lottery Contract", function () {
       await lottery.connect(player1).enterLottery({ value: ENTRY_FEE });
       await lottery.connect(player1).enterLottery({ value: ENTRY_FEE });
 
-      const numPlayers = await lottery.getNoOfPlayer();
+      const numPlayers = await lottery.getNumberOfPlayers();
       expect(numPlayers).to.equal(2); // Same user can enter multiple times
     });
 
@@ -273,7 +273,7 @@ describe("Lottery Contract", function () {
       }
 
       const players = await lottery.getPlayers();
-      expect(players.length).to.equal(await lottery.getNoOfPlayer());
+      expect(players.length).to.equal(await lottery.getNumberOfPlayers());
     });
   });
 });

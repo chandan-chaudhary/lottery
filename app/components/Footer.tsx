@@ -1,14 +1,14 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-900/80 backdrop-blur-md border-t border-purple-500/20 mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="bg-gray-900/80 backdrop-blur-md border-t border-purple-500/20 mt-12 sm:mt-16 md:mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {/* About */}
           <div>
-            <h3 className="text-lg font-bold text-white mb-3">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-2 sm:mb-3">
               About CryptoLottery
             </h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-xs sm:text-sm text-gray-400">
               A fully decentralized lottery powered by Chainlink VRF for
               provably fair randomness. Built on Ethereum for transparency and
               security.
@@ -17,12 +17,14 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-bold text-white mb-3">Quick Links</h3>
-            <ul className="space-y-2">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-2 sm:mb-3">
+              Quick Links
+            </h3>
+            <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
+                  className="text-xs sm:text-sm text-gray-400 hover:text-purple-400 transition-colors"
                 >
                   How It Works
                 </a>
@@ -30,7 +32,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
+                  className="text-xs sm:text-sm text-gray-400 hover:text-purple-400 transition-colors"
                 >
                   Smart Contract
                 </a>
@@ -38,7 +40,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
+                  className="text-xs sm:text-sm text-gray-400 hover:text-purple-400 transition-colors"
                 >
                   Documentation
                 </a>
@@ -46,7 +48,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
+                  className="text-xs sm:text-sm text-gray-400 hover:text-purple-400 transition-colors"
                 >
                   FAQ
                 </a>
@@ -55,8 +57,10 @@ export default function Footer() {
           </div>
 
           {/* Contract Info */}
-          <div>
-            <h3 className="text-lg font-bold text-white mb-3">Contract Info</h3>
+          <div className="sm:col-span-2 md:col-span-1">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-2 sm:mb-3">
+              Contract Info
+            </h3>
             <div className="space-y-2">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Contract Address</p>
@@ -66,17 +70,19 @@ export default function Footer() {
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Network</p>
-                <p className="text-sm text-gray-300">Sepolia Testnet</p>
+                <p className="text-xs sm:text-sm text-gray-300">
+                  Sepolia Testnet
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-purple-500/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-400">
-            © 2025 CryptoLottery. All rights reserved.
+        <div className="border-t border-purple-500/20 mt-6 sm:mt-8 pt-4 sm:pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
+          <p className="text-xs sm:text-sm text-gray-400 text-center sm:text-left">
+            © {new Date().getFullYear()} CryptoLottery. All rights reserved.
           </p>
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
+          <div className="flex items-center space-x-4">
             <a
               href="https://github.com/chandan-chaudhary/lottery"
               target="_blank"
@@ -84,7 +90,7 @@ export default function Footer() {
               className="text-gray-400 hover:text-purple-400 transition-colors"
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5 sm:w-6 sm:h-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"

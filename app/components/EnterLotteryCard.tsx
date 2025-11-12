@@ -106,21 +106,19 @@ export default function EnterLotteryCard() {
       }
 
       // Call write helper from hook (returns receipt)
-            const receipt = await enterLottery(signer, value);
-            // Normalize possible hash fields from different ethers versions
-            const txHashValue: string | null =
-              receipt && typeof receipt === "object"
-                ? (
-                    "transactionHash" in receipt
-                      ? (receipt as { transactionHash?: string }).transactionHash
-                      : (receipt as { hash?: string }).hash
-                  ) ?? null
-                : null;
-            setTxHash(txHashValue);
-            toast.success("Entered lottery — transaction confirmed");
+      const receipt = await enterLottery(signer, value);
+      // Normalize possible hash fields from different ethers versions
+      const txHashValue: string | null =
+        receipt && typeof receipt === "object"
+          ? ("transactionHash" in receipt
+              ? (receipt as { transactionHash?: string }).transactionHash
+              : (receipt as { hash?: string }).hash) ?? null
+          : null;
+      setTxHash(txHashValue);
+      toast.success("Entered lottery — transaction confirmed");
     } catch (err) {
       console.log(err);
-      
+
       const e = err as { code?: number; message?: string } | undefined;
       console.error(e?.message ?? err);
       toast.error(e?.message ?? String(err));
@@ -130,14 +128,18 @@ export default function EnterLotteryCard() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
+    <div className="bg-linear-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
       <div>
-        <h2 className="text-2xl font-bold text-white">Enter Lottery</h2>
-        <p className="text-gray-400 text-sm">Buy your ticket to win big!</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white">
+          Enter Lottery
+        </h2>
+        <p className="text-gray-400 text-xs sm:text-sm">
+          Buy your ticket to win big!
+        </p>
       </div>
-      <div className="space-y-4 mt-6">
+      <div className="space-y-3 sm:space-y-4 mt-4 sm:mt-6">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
             Entry Amount
           </label>
           <div className="relative">
@@ -148,9 +150,9 @@ export default function EnterLotteryCard() {
               placeholder="0.01"
               step="0.01"
               min="0.01"
-              className="w-full py-2 px-4 rounded-lg bg-gray-800 text-white border border-purple-500/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full py-2 px-3 sm:px-4 rounded-lg bg-gray-800 text-white text-sm sm:text-base border border-purple-500/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
-            <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium">
+            <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium text-sm">
               ETH
             </span>
           </div>
@@ -158,23 +160,27 @@ export default function EnterLotteryCard() {
             Minimum entry: {entryAmount} ETH
           </p>
         </div>
-        <div className="bg-gray-900/50 border border-purple-500/20 rounded-lg p-4">
+        <div className="bg-gray-900/50 border border-purple-500/20 rounded-lg p-3 sm:p-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-400">Your Entry</span>
-            <span className="text-sm font-medium text-white">
+            <span className="text-xs sm:text-sm text-gray-400">Your Entry</span>
+            <span className="text-xs sm:text-sm font-medium text-white">
               {entryAmount} ETH
             </span>
           </div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-400">Gas Fee (est.)</span>
-            <span className="text-sm font-medium text-white">
+            <span className="text-xs sm:text-sm text-gray-400">
+              Gas Fee (est.)
+            </span>
+            <span className="text-xs sm:text-sm font-medium text-white">
               {gasEstimate !== null ? `~${gasEstimate.toFixed(4)} ETH` : "-"}
             </span>
           </div>
           <div className="border-t border-purple-500/20 pt-2 mt-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-300">Total</span>
-              <span className="text-lg font-bold text-purple-400">
+              <span className="text-xs sm:text-sm font-medium text-gray-300">
+                Total
+              </span>
+              <span className="text-base sm:text-lg font-bold text-purple-400">
                 {totalCost !== null ? `${totalCost.toFixed(4)} ETH` : "-"}
               </span>
             </div>
@@ -183,11 +189,11 @@ export default function EnterLotteryCard() {
         <button
           onClick={handleEnterLottery}
           disabled={isLoading}
-          className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all duration-200 shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 disabled:shadow-none flex items-center justify-center space-x-2"
+          className="w-full py-3 sm:py-4 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold text-sm sm:text-base rounded-lg transition-all duration-200 shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 disabled:shadow-none flex items-center justify-center space-x-2"
         >
           {isLoading ? (
             <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               <span>Processing...</span>
             </>
           ) : (
@@ -198,13 +204,15 @@ export default function EnterLotteryCard() {
           )}
         </button>
         {txHash && (
-          <div className="mt-4 text-center">
-            <span className="text-sm text-gray-400">Transaction Hash:</span>
+          <div className="mt-3 sm:mt-4 text-center">
+            <span className="text-xs sm:text-sm text-gray-400">
+              Transaction Hash:
+            </span>
             <a
               href={`https://sepolia.etherscan.io/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-purple-400 font-mono break-all hover:underline"
+              className="block text-purple-400 font-mono text-xs sm:text-sm break-all hover:underline mt-1"
             >
               {txHash}
             </a>
