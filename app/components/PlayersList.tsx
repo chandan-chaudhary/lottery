@@ -1,35 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useLotteryContract } from "../hooks/useLotterContract";
-
-type Player = {
-  address: string;
-  entries: number;
-};
+import React from "react";
+import { useLotteryData } from "../contexts/LotteryContext";
 
 export default function PlayersList() {
-  const { getListOfPlayers } = useLotteryContract();
-  const [players, setPlayers] = useState<Player[]>([]);
-
-  useEffect(() => {
-    let mounted = true;
-    async function fetchPlayers() {
-      try {
-        const list = await getListOfPlayers();
-        if (mounted && Array.isArray(list)) {
-          setPlayers(list);
-        }
-      } catch (err) {
-        // optionally handle error
-        console.error("Failed to load players", err);
-      }
-    }
-    fetchPlayers();
-    return () => {
-      mounted = false;
-    };
-  }, [getListOfPlayers]);
+  const { players } = useLotteryData();
 
   return (
     <div className="bg-linear-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl">

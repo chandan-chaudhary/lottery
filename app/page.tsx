@@ -6,65 +6,12 @@ import EnterLotteryCard from "./components/EnterLotteryCard";
 import LotteryPoolCard from "./components/LotteryPoolCard";
 import WinnerCard from "./components/WinnerCard";
 import PlayersList from "./components/PlayersList";
-import { useLotteryContract } from "@/app/hooks/useLotterContract";
-import { useEffect, useState } from "react";
 import { formatLotteryState } from "@/lib/utils";
-
-// PRODUCTION BEST PRACTICES:
-// 1. Always keep your ABI and TypeChain types in sync with your deployed contract (copy after every contract change).
-// 2. Use TypeChain types for type safety and autocompletion.
-// 3. Add runtime error handling for contract read failures.
+import { useLotteryData } from "./contexts/LotteryContext";
 
 export default function Home() {
-  const [prizePool, setPrizePool] = useState<number | null>(null);
-  const [totalPlayers, setTotalPlayers] = useState<number | null>(null);
-  // const [lastWinner, setLastWinner] = useState<string | null>(null);
-  const [lastTimeStamp, setLastTimeStamp] = useState<bigint | null>(null);
-  const [lotteryState, setLotteryState] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const {
-    getEntryFee,
-    getTotalPlayers,
-    getLastWinner,
-    getLotteryState,
-    getLastTimeStamp,
-  } = useLotteryContract();
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const entryFee = await getEntryFee();
-        setPrizePool(entryFee);
-        const players = await getTotalPlayers();
-        setTotalPlayers(players);
-        const state = await getLotteryState();
-        setLotteryState(state);
-        const timestamp = await getLastTimeStamp();
-        setLastTimeStamp(timestamp);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("Error fetching contract data");
-        }
-      }
-    }
-    // fetchData();
-    const intervalId = window.setInterval(() => {
-      fetchData();
-    }, 10000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [
-    getEntryFee,
-    getTotalPlayers,
-    getLastWinner,
-    getLotteryState,
-    getLastTimeStamp,
-  ]);
+  const { prizePool, totalPlayers, lastTimeStamp, lotteryState, error } =
+    useLotteryData();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900/90 to-gray-900">
@@ -124,9 +71,9 @@ export default function Home() {
                       }`}
                       aria-label="Live State Dot"
                     ></span>
-                    <span className="hidden sm:inline">Lottery State: </span>
-                    <span className="sm:hidden">Status: </span>
-                    {error ? "Error" : state}
+                    {/* <span className="hidden sm:inline">Lottery State: </span>
+                    <span className="sm:hidden">Status: </span> */}
+                    <span className="uppercase">{error ? "Error" : state}</span>
                   </span>
                 </div>
               );
@@ -172,10 +119,10 @@ export default function Home() {
               error
                 ? "Error"
                 : lastTimeStamp !== null
-                ? new Date(Number(lastTimeStamp)).toLocaleString()
+                ? new Date(Number(lastTimeStamp) * 1000).toLocaleString()
                 : "Loading..."
             }
-            subtext={error ? error : "Last timestamp"}
+            subtext={error ? error : "Last draw time"}
             linear="from-orange-500 to-red-500"
           />
         </div>
@@ -184,13 +131,13 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* Left Column */}
           <div className="space-y-6 sm:space-y-8">
-            <EnterLotteryCard />
             <LotteryPoolCard />
+            <WinnerCard />
           </div>
 
           {/* Right Column */}
           <div className="space-y-6 sm:space-y-8">
-            <WinnerCard />
+            <EnterLotteryCard />
             <PlayersList />
           </div>
         </div>

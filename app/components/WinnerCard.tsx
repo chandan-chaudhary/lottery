@@ -1,36 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useLotteryContract } from "../hooks/useLotterContract";
+import { useLotteryData } from "../contexts/LotteryContext";
 
 export default function WinnerCard() {
-  const { getLastWinner, getAllRecentWinners } = useLotteryContract();
-  const [lastWinner, setLastWinner] = useState<string | null>(null);
-  const [allWinners, setAllWinners] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchWinners() {
-      try {
-        setLoading(true);
-        const recentWinner = await getLastWinner();
-        const winners = await getAllRecentWinners();
-
-        setLastWinner(recentWinner);
-        setAllWinners(winners);
-      } catch (error) {
-        console.error("Error fetching winners:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchWinners();
-
-    // Refetch every 10 seconds
-    const interval = setInterval(fetchWinners, 300000);
-    return () => clearInterval(interval);
-  }, [getLastWinner, getAllRecentWinners]);
+  const { lastWinner, allWinners, isLoading } = useLotteryData();
 
   // Helper to mask address
   const maskAddress = (addr: string) =>
@@ -41,7 +14,7 @@ export default function WinnerCard() {
   const hasWinner =
     lastWinner && lastWinner !== "0x0000000000000000000000000000000000000000";
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="bg-linear-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl">
         <div className="flex items-center justify-center h-64">

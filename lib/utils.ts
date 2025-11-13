@@ -21,9 +21,9 @@ export function formatLotteryState(state: number | null) {
     case 0:
       return "Open";
     case 1:
-      return "Closed";
-    case 2:
       return "Calculating";
+    case 2:
+      return "Closed";
     default:
       return `Unknown (${state})`;
   }

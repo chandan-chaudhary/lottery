@@ -46,6 +46,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     uint256 private s_lastTimeStamp;
     address payable[] private s_players;
     address[] private s_allRecentWinners;
+    uint8 private s_minNoOfPlayers;
 
     // Events
     event LotteryEnter(address indexed player);
@@ -58,13 +59,15 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         uint256 _subscriptionId,
         bytes32 _keyHash,
         uint32 _callbackGasLimit,
-        uint256 _interval
+        uint256 _interval,
+        uint8 _min_NoOfPlayers
     ) VRFConsumerBaseV2Plus(_vrfCoordinator) {
         s_lotteryEntryFee = _lotteryEntryFee;
         i_subscriptionId = _subscriptionId;
         i_keyHash = _keyHash;
         i_callbackGasLimit = _callbackGasLimit;
         s_interval = _interval;
+        s_minNoOfPlayers = _min_NoOfPlayers; // Default minimum number of players
         s_lotteryState = LotteryState.OPEN;
         s_lastTimeStamp = block.timestamp; // ✅ Initialize timestamp in constructor
     }
@@ -107,6 +110,15 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     }
 
     /**
+     * @notice Updates the minimum number of players required to trigger a lottery draw.
+     * @dev Only callable by the owner.
+     * @param _minNoOfPlayers The new minimum number of players.
+     */
+    function setMinNoOfPlayers(uint8 _minNoOfPlayers) external onlyOwner {
+        s_minNoOfPlayers = _minNoOfPlayers;
+    }
+
+    /**
      * @dev Allows a user to enter the lottery by paying the entry fee
      */
     function enterLottery() external payable {
@@ -130,7 +142,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     {
         bool isOpen = (s_lotteryState == LotteryState.OPEN);
         bool timePassed = ((block.timestamp - s_lastTimeStamp) > s_interval);
-        bool hasPlayers = (s_players.length > 0);
+        bool hasPlayers = (s_players.length >= s_minNoOfPlayers);
         bool hasBalance = (address(this).balance > 0);
 
         upkeepNeeded = (isOpen && timePassed && hasPlayers && hasBalance);

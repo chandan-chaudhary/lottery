@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [newOwner, setNewOwner] = useState("");
   const [newEntryFee, setNewEntryFee] = useState("");
   const [newInterval, setNewInterval] = useState("");
+  const [newMinPlayers, setNewMinPlayers] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -23,16 +24,19 @@ export default function AdminPage() {
     getEntryFee,
     getInterval,
     getContractBalance,
+    getMinNoOfPlayers,
     changeOwner,
     emergencyWithdraw,
     setInterval: setIntervalHook,
     setLotteryEntryFee,
+    setMinNoOfPlayers,
   } = useLotteryContract();
 
   // State for contract data
   const [currentOwner, setCurrentOwner] = useState<string | undefined>();
   const [currentEntryFee, setCurrentEntryFee] = useState<number>(0);
   const [currentInterval, setCurrentInterval] = useState<bigint | undefined>();
+  const [currentMinPlayers, setCurrentMinPlayers] = useState<number>(0);
   const [contractBalance, setContractBalance] = useState<number>(0);
 
   // Fetch contract data
@@ -43,11 +47,13 @@ export default function AdminPage() {
         const entryFee = await getEntryFee();
         const interval = await getInterval();
         const balance = await getContractBalance();
+        const minPlayers = await getMinNoOfPlayers();
 
         setCurrentOwner(owner);
         setCurrentEntryFee(entryFee);
         setCurrentInterval(interval);
         setContractBalance(balance);
+        setCurrentMinPlayers(minPlayers);
       } catch (error) {
         console.error("Error fetching contract data:", error);
       }
@@ -59,7 +65,13 @@ export default function AdminPage() {
     const interval = setInterval(fetchData, 5000);
 
     return () => clearInterval(interval);
-  }, [getOwner, getEntryFee, getInterval, getContractBalance]);
+  }, [
+    getOwner,
+    getEntryFee,
+    getInterval,
+    getContractBalance,
+    getMinNoOfPlayers,
+  ]);
 
   const isOwner =
     address &&
@@ -158,13 +170,6 @@ export default function AdminPage() {
       setIsSuccess(false);
       if (!walletClient) throw new Error("Wallet not connected");
       const signer = await walletClientToSigner(walletClient);
-      // const signer = await provider.getSigner(
-      //   (walletClient.account as Account).address
-      // );
-
-      // const provider = new ethers.BrowserProvider(window.ethereum);
-      // const signer = await provider.getSigner();
-      // return signer;
       const receipt = await emergencyWithdraw(signer);
       console.log("Emergency withdrawal successful:", receipt?.hash);
       setIsSuccess(true);
@@ -172,6 +177,29 @@ export default function AdminPage() {
       console.error("Error withdrawing funds:", error);
       alert(
         error instanceof Error ? error.message : "Failed to withdraw funds"
+      );
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const handleUpdateMinPlayers = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMinPlayers) return;
+
+    try {
+      setIsPending(true);
+      setIsSuccess(false);
+      if (!walletClient) throw new Error("Wallet not connected");
+      const signer = await walletClientToSigner(walletClient);
+      const receipt = await setMinNoOfPlayers(signer, parseInt(newMinPlayers));
+      console.log("Min players updated successfully:", receipt?.hash);
+      setIsSuccess(true);
+      setNewMinPlayers("");
+    } catch (error) {
+      console.error("Error updating min players:", error);
+      alert(
+        error instanceof Error ? error.message : "Failed to update min players"
       );
     } finally {
       setIsPending(false);
@@ -243,7 +271,7 @@ export default function AdminPage() {
         </div>
 
         {/* Current Settings */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 sm:p-5 md:p-6 border border-white/20">
             <h3 className="text-white/60 text-xs sm:text-sm font-medium mb-2">
               Current Entry Fee
@@ -260,7 +288,15 @@ export default function AdminPage() {
               {currentInterval ? currentInterval.toString() : "0"} seconds
             </p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 sm:p-5 md:p-6 border border-white/20 sm:col-span-2 md:col-span-1">
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 sm:p-5 md:p-6 border border-white/20">
+            <h3 className="text-white/60 text-xs sm:text-sm font-medium mb-2">
+              Min Players Required
+            </h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">
+              {currentMinPlayers}
+            </p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 sm:p-5 md:p-6 border border-white/20">
             <h3 className="text-white/60 text-xs sm:text-sm font-medium mb-2">
               Contract Balance
             </h3>
@@ -365,6 +401,42 @@ export default function AdminPage() {
                 className="w-full bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold text-sm sm:text-base py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isPending ? "Updating Interval..." : "Update Interval"}
+              </button>
+            </form>
+          </div>
+
+          {/* Update Min Players */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 shadow-xl">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">
+              👥 Update Min Players
+            </h2>
+            <form
+              onSubmit={handleUpdateMinPlayers}
+              className="space-y-3 sm:space-y-4"
+            >
+              <div>
+                <label className="block text-white/80 text-xs sm:text-sm font-medium mb-2">
+                  Minimum Players Required
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="255"
+                  value={newMinPlayers}
+                  onChange={(e) => setNewMinPlayers(e.target.value)}
+                  placeholder="1"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <p className="text-xs text-white/60 mt-1">
+                  Lottery won&apos;t start until this many players join
+                </p>
+              </div>
+              <button
+                type="submit"
+                disabled={isPending || !newMinPlayers}
+                className="w-full bg-linear-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold text-sm sm:text-base py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isPending ? "Updating Min Players..." : "Update Min Players"}
               </button>
             </form>
           </div>

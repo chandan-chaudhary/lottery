@@ -78,6 +78,17 @@ export function useLotteryContract() {
     return await contract.owner();
   }, [contract]);
 
+  // Temporary getter until TypeChain types are regenerated
+  const getMinNoOfPlayers = useCallback(async () => {
+    try {
+      return 2;
+      // Number(await contract.getMinNoOfPlayers());
+    } catch (error) {
+      console.error("Error fetching min players:", error);
+      return 2; // Default value
+    }
+  }, []);
+
   // Add more contract functions as needed
   // Write function: accepts an ethers.Signer (this can be from wagmi's useSigner or a BrowserProvider signer)
   // Returns the transaction receipt so callers can show tx hash / status.
@@ -195,6 +206,28 @@ export function useLotteryContract() {
     []
   );
 
+  // Owner function: Set minimum number of players
+  const setMinNoOfPlayers = useCallback(
+    async (signer: ethers.Signer, minPlayers: number) => {
+      try {
+        const contractWithSigner = Lottery__factory.connect(
+          LOTTERY_ADDRESS,
+          signer
+        );
+        const tx = await contractWithSigner.setMinNoOfPlayers(minPlayers);
+        const receipt = await tx.wait();
+        return receipt;
+      } catch (err) {
+        const e = err as { code?: number; message?: string } | undefined;
+        if (e?.code === 4001) {
+          throw new Error("Transaction rejected by user");
+        }
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     getEntryFee,
     getTotalPlayers,
@@ -215,5 +248,7 @@ export function useLotteryContract() {
     emergencyWithdraw,
     setInterval,
     setLotteryEntryFee,
+    setMinNoOfPlayers,
+    getMinNoOfPlayers,
   };
 }

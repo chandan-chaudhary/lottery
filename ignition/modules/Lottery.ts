@@ -66,7 +66,7 @@ const LotteryModule = buildModule("LotteryModule", (m) => {
    */
   const keyHash = m.getParameter(
     "keyHash",
-    "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c" // Sepolia 150 gwei
+    "0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae" // Sepolia 500 gwei
   );
 
   /**
@@ -84,7 +84,7 @@ const LotteryModule = buildModule("LotteryModule", (m) => {
    */
   const callbackGasLimit = m.getParameter(
     "callbackGasLimit",
-    500000 // 100k gas
+    300000 // 300k gas
   );
 
   /**
@@ -100,9 +100,11 @@ const LotteryModule = buildModule("LotteryModule", (m) => {
    */
   const interval = m.getParameter(
     "interval",
-    120 // 120 seconds
+    600 // 600 seconds
   );
 
+  const minNoOfPlayers = m.getParameter("minNoOfPlayers", 2);
+  //                                     ↑ NO underscore here
   // ========================================
   // CONTRACT DEPLOYMENT
   // ========================================
@@ -125,6 +127,7 @@ const LotteryModule = buildModule("LotteryModule", (m) => {
     keyHash,
     callbackGasLimit,
     interval,
+    minNoOfPlayers,
   ]);
 
   // ========================================

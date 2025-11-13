@@ -10,6 +10,7 @@ import { useConnect, useAccount, useWalletClient } from "wagmi";
 import { Lottery__factory } from "@/types/ethers-contracts";
 import toast from "react-hot-toast";
 import type { Account, Chain, WalletClient } from "viem";
+import { useLotteryData } from "../contexts/LotteryContext";
 
 // Helper function to convert WalletClient to ethers Signer
 function walletClientToSigner(walletClient: WalletClient) {
@@ -25,19 +26,17 @@ function walletClientToSigner(walletClient: WalletClient) {
 }
 
 export default function EnterLotteryCard() {
+  const { entryFee, refreshData } = useLotteryData();
   const [entryAmount, setEntryAmount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [gasEstimate, setGasEstimate] = useState<number | null>(null);
   const [totalCost, setTotalCost] = useState<number | null>(null);
-  const { getEntryFee, enterLottery } = useLotteryContract();
+  const { enterLottery } = useLotteryContract();
 
+  // Update entry amount when entryFee changes
   useEffect(() => {
-    const fetchData = async () => {
-      const entryFee = await getEntryFee();
-      setEntryAmount(entryFee);
-    };
-    fetchData();
-  }, [getEntryFee]);
+    setEntryAmount(entryFee);
+  }, [entryFee]);
 
   // wagmi hooks - updated for v1+
   const { data: walletClient } = useWalletClient();
@@ -116,6 +115,9 @@ export default function EnterLotteryCard() {
           : null;
       setTxHash(txHashValue);
       toast.success("Entered lottery — transaction confirmed");
+
+      // Refresh all lottery data immediately
+      await refreshData();
     } catch (err) {
       console.log(err);
 

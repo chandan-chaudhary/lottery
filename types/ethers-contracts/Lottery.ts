@@ -49,6 +49,7 @@ export interface LotteryInterface extends Interface {
       | "setCoordinator"
       | "setInterval"
       | "setLotteryEntryFee"
+      | "setMinNoOfPlayers"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -152,6 +153,10 @@ export interface LotteryInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "setMinNoOfPlayers",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
@@ -240,6 +245,10 @@ export interface LotteryInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setLotteryEntryFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMinNoOfPlayers",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -435,6 +444,12 @@ export interface Lottery extends BaseContract {
     "nonpayable"
   >;
 
+  setMinNoOfPlayers: TypedContractMethod<
+    [_minNoOfPlayers: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   transferOwnership: TypedContractMethod<
     [to: AddressLike],
     [void],
@@ -522,6 +537,9 @@ export interface Lottery extends BaseContract {
   getFunction(
     nameOrSignature: "setLotteryEntryFee"
   ): TypedContractMethod<[newEntryFee: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setMinNoOfPlayers"
+  ): TypedContractMethod<[_minNoOfPlayers: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[to: AddressLike], [void], "nonpayable">;
