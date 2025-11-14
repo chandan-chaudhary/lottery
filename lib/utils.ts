@@ -30,6 +30,29 @@ export function formatLotteryState(state: number | null) {
 }
 
 
+import { ethers } from "ethers";
+import type { Account, Chain, WalletClient } from "viem";
+
+/**
+ * Universal helper function to convert WalletClient (from wagmi) to ethers Signer
+ * This works on both desktop (browser extensions) and mobile (wallet apps)
+ *
+ * @param walletClient - The WalletClient from wagmi's useWalletClient hook
+ * @returns ethers.Signer instance for signing transactions
+ */
+export async function walletClientToSigner(walletClient: WalletClient) {
+  const { account, chain, transport } = walletClient;
+  const network = {
+    chainId: (chain as Chain).id,
+    name: (chain as Chain).name,
+    ensAddress: (chain as Chain).contracts?.ensRegistry?.address,
+  };
+  const provider = new ethers.BrowserProvider(transport, network);
+  const signer = await provider.getSigner((account as Account).address);
+  return signer;
+}
+
+
 
 
 // "devDependencies": {

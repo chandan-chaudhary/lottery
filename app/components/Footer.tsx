@@ -1,3 +1,5 @@
+import { LOTTERY_ADDRESS } from "../hooks/useLotterContract";
+
 export default function Footer() {
   return (
     <footer className="bg-gray-900/80 backdrop-blur-md border-t border-purple-500/20 mt-12 sm:mt-16 md:mt-20">
@@ -65,7 +67,7 @@ export default function Footer() {
               <div>
                 <p className="text-xs text-gray-500 mb-1">Contract Address</p>
                 <p className="text-xs font-mono text-gray-300 break-all">
-                  0xf6Eac2EAEcB87Acf68412CA177aD8b6c84667422
+                  {LOTTERY_ADDRESS}
                 </p>
               </div>
               <div>

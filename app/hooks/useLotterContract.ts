@@ -35,9 +35,18 @@ export function useLotteryContract() {
 
   const getListOfPlayers = useCallback(async () => {
     const players = await contract.getPlayers();
-    return players.map((player) => ({
-      address: player,
-      entries: 1, // Default to 1 entry per player
+
+    // Count entries for each unique address
+    const addressCounts = new Map<string, number>();
+    players.forEach((player) => {
+      const address = player.toLowerCase(); // Normalize to lowercase
+      addressCounts.set(address, (addressCounts.get(address) || 0) + 1);
+    });
+
+    // Convert to array of unique players with their entry counts
+    return Array.from(addressCounts.entries()).map(([address, entries]) => ({
+      address: players.find((p) => p.toLowerCase() === address) || address, // Keep original case
+      entries,
     }));
   }, [contract]);
   const getLastWinner = useCallback(async () => {

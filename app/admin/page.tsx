@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useAccount, useWalletClient } from "wagmi";
-import { parseEther, BrowserProvider } from "ethers";
+import { parseEther } from "ethers";
 import Link from "next/link";
 import { useLotteryContract } from "@/app/hooks/useLotterContract";
-import type { Account, Chain, WalletClient } from "viem";
+import { walletClientToSigner } from "@/lib/utils";
 
 export default function AdminPage() {
   const { address, isConnected } = useAccount();
@@ -77,19 +77,6 @@ export default function AdminPage() {
     address &&
     currentOwner &&
     address.toLowerCase() === currentOwner.toLowerCase();
-
-  // Helper function to get signer from walletClient (same as EnterLotteryCard)
-  function walletClientToSigner(walletClient: WalletClient) {
-    const { account, chain, transport } = walletClient;
-    const network = {
-      chainId: (chain as Chain).id,
-      name: (chain as Chain).name,
-      ensAddress: (chain as Chain).contracts?.ensRegistry?.address,
-    };
-    const provider = new BrowserProvider(transport, network);
-    const signer = provider.getSigner((account as Account).address);
-    return signer;
-  }
 
   const handleChangeOwner = async (e: React.FormEvent) => {
     e.preventDefault();

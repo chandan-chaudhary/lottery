@@ -9,21 +9,8 @@ import { ethers } from "ethers";
 import { useConnect, useAccount, useWalletClient } from "wagmi";
 import { Lottery__factory } from "@/types/ethers-contracts";
 import toast from "react-hot-toast";
-import type { Account, Chain, WalletClient } from "viem";
 import { useLotteryData } from "../contexts/LotteryContext";
-
-// Helper function to convert WalletClient to ethers Signer
-function walletClientToSigner(walletClient: WalletClient) {
-  const { account, chain, transport } = walletClient;
-  const network = {
-    chainId: (chain as Chain).id,
-    name: (chain as Chain).name,
-    ensAddress: (chain as Chain).contracts?.ensRegistry?.address,
-  };
-  const provider = new ethers.BrowserProvider(transport, network);
-  const signer = provider.getSigner((account as Account).address);
-  return signer;
-}
+import { walletClientToSigner } from "@/lib/utils";
 
 export default function EnterLotteryCard() {
   const { entryFee, refreshData } = useLotteryData();
@@ -39,7 +26,8 @@ export default function EnterLotteryCard() {
   }, [entryFee]);
 
   // wagmi hooks - updated for v1+
-  const { data: walletClient } = useWalletClient();
+  const { data: walletClient, refetch: refetchWalletClient } =
+    useWalletClient();
   const { connectAsync, connectors } = useConnect();
   const { address, isConnected } = useAccount();
 
@@ -49,26 +37,41 @@ export default function EnterLotteryCard() {
     setIsLoading(true);
     setTxHash(null);
     try {
-      let signer;
+      let currentWalletClient = walletClient;
+      let currentAddress = address;
 
       // Check if wallet is connected
-      if (!isConnected || !walletClient) {
+      if (!isConnected || !currentWalletClient) {
         const connector =
           connectors.find((c) => c.id === "injected") || connectors[0];
         if (!connector) throw new Error("No wallet connectors available");
 
-        await connectAsync({ connector });
+        // Connect wallet and get the accounts
+        const result = await connectAsync({ connector });
+        currentAddress = result.accounts[0];
 
-        // After connecting, wait a bit and get the provider
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        signer = await provider.getSigner();
-      } else {
-        // Convert WalletClient to ethers Signer
-        signer = await walletClientToSigner(walletClient);
+        // Refetch walletClient after connection
+        const { data: newWalletClient } = await refetchWalletClient();
+        currentWalletClient = newWalletClient;
+
+        if (!currentWalletClient) {
+          throw new Error("Please connect your wallet and try again");
+        }
       }
 
+      // Ensure we have walletClient and address
+      if (!currentWalletClient || !currentAddress) {
+        throw new Error("Please connect your wallet first");
+      }
+
+      const signer = await walletClientToSigner(currentWalletClient);
+
       const value = ethers.parseEther(entryAmount.toString());
-      const provider = new ethers.BrowserProvider(window.ethereum);
+
+      // Use walletClient's provider instead of window.ethereum
+      const provider = new ethers.BrowserProvider(
+        currentWalletClient.transport
+      );
 
       // Estimate gas and get fee data
       let gas = 0;
@@ -80,8 +83,11 @@ export default function EnterLotteryCard() {
         const gasEstimateBigInt = await contract.enterLottery.estimateGas({
           value,
         });
+
+        // Get fee data with fallback for networks that don't support EIP-1559
         const feeData = await provider.getFeeData();
-        const gasPrice = feeData.maxFeePerGas ?? feeData.gasPrice ?? BigInt(0);
+        const gasPrice = feeData.gasPrice ?? BigInt(20000000000); // 20 gwei fallback
+
         // Calculate gas cost in ETH
         const gasCostEth = Number(
           ethers.formatEther(gasEstimateBigInt * gasPrice)
@@ -96,8 +102,8 @@ export default function EnterLotteryCard() {
         setTotalCost(null);
       }
 
-      // Check balance
-      const balance = await provider.getBalance(address!);
+      // Check balance using the correct address
+      const balance = await provider.getBalance(currentAddress);
       if (balance < value) {
         toast.error("Insufficient funds to cover entry + gas");
         setIsLoading(false);
@@ -130,7 +136,7 @@ export default function EnterLotteryCard() {
   };
 
   return (
-    <div className="bg-linear-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
+    <div className="bg-linear-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 md:max-h-[700px]">
       <div>
         <h2 className="text-xl sm:text-2xl font-bold text-white">
           Enter Lottery

@@ -1,17 +1,60 @@
 "use client";
+import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import StatsCard from "./components/StatsCard";
 import EnterLotteryCard from "./components/EnterLotteryCard";
 import LotteryPoolCard from "./components/LotteryPoolCard";
 import WinnerCard from "./components/WinnerCard";
-import PlayersList from "./components/PlayersList";
 import { formatLotteryState } from "@/lib/utils";
 import { useLotteryData } from "./contexts/LotteryContext";
 
 export default function Home() {
-  const { prizePool, totalPlayers, lastTimeStamp, lotteryState, error } =
-    useLotteryData();
+  const {
+    prizePool,
+    totalPlayers,
+    lastTimeStamp,
+    lotteryState,
+    error,
+    interval,
+  } = useLotteryData();
+  const [nextDrawIn, setNextDrawIn] = useState<string>("Loading...");
+
+  const calculateTimeRemaining = (
+    lastTimestamp: bigint | null,
+    intervalTime: bigint | null
+  ) => {
+    if (!lastTimestamp || !intervalTime) return "Loading...";
+
+    const now = Math.floor(Date.now() / 1000);
+    const lastTime = Number(lastTimestamp);
+    const intervalSeconds = Number(intervalTime);
+    const nextDrawTime = lastTime + intervalSeconds;
+    const secondsRemaining = Math.max(0, nextDrawTime - now);
+
+    const hours = Math.floor(secondsRemaining / 3600);
+    const minutes = Math.floor((secondsRemaining % 3600) / 60);
+    const seconds = secondsRemaining % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    } else {
+      return `${seconds}s`;
+    }
+  };
+
+  // Update countdown every second
+  useEffect(() => {
+    const updateCountdown = () => {
+      setNextDrawIn(calculateTimeRemaining(lastTimeStamp, interval));
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [lastTimeStamp, interval]);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900/90 to-gray-900">
@@ -30,7 +73,7 @@ export default function Home() {
             chance to win big on the blockchain! 🚀
           </p>
           {/* Highlighted Lottery State */}
-          <div className="flex justify-center mt-4 sm:mt-6 px-4">
+          <div className="flex justify-center mt-4 sm:mt-6 px-4 w-full">
             {(() => {
               const state = formatLotteryState(lotteryState);
               let bg = "";
@@ -53,7 +96,7 @@ export default function Home() {
               }
               return (
                 <div
-                  className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg ${bg} animate-pulse border-2 ${border}`}
+                  className={`flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg ${bg} animate-pulse border-2 ${border} min-w-[150px]`}
                   style={{ background: "inherit" }}
                 >
                   <span className="flex items-center text-sm sm:text-base lg:text-lg font-bold text-white tracking-wide drop-shadow-lg">
@@ -82,7 +125,7 @@ export default function Home() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
           <StatsCard
             icon="💎"
             label="Prize Pool"
@@ -96,6 +139,13 @@ export default function Home() {
             value={error ? "Error" : totalPlayers?.toString() ?? "Loading..."}
             subtext={error ? error : "Active participants"}
             linear="from-blue-500 to-cyan-500"
+          />
+          <StatsCard
+            icon="⏰"
+            label="Next Draw In"
+            value={error ? "Error" : nextDrawIn}
+            subtext={error ? error : "Time remaining"}
+            linear="from-purple-500 to-pink-500"
           />
           {/* <StatsCard
             icon="🏆"
@@ -129,17 +179,9 @@ export default function Home() {
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
-          {/* Left Column */}
-          <div className="space-y-6 sm:space-y-8">
-            <LotteryPoolCard />
-            <WinnerCard />
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-6 sm:space-y-8">
-            <EnterLotteryCard />
-            <PlayersList />
-          </div>
+          <EnterLotteryCard />
+          <LotteryPoolCard />
+          <WinnerCard />
         </div>
 
         {/* How It Works Section */}

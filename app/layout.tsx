@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Decentralized Lottery - Win Big with Blockchain",
+  title: "Lottery - Win Big with Blockchain",
   description: "Join our transparent and fair blockchain-based lottery system. Participate in decentralized draws with instant payouts and provably fair results.",
 };
 

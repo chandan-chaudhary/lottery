@@ -62,7 +62,7 @@ export default function WinnerCard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {/* <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <p className="text-xs text-gray-400 mb-1">Status</p>
                 <p className="text-lg sm:text-xl font-bold text-yellow-400">
@@ -73,7 +73,7 @@ export default function WinnerCard() {
                 <p className="text-xs text-gray-400 mb-1">Time</p>
                 <p className="text-xs sm:text-sm text-gray-300">Recently</p>
               </div>
-            </div>
+            </div> */}
 
             <a
               href={`https://sepolia.etherscan.io/address/${lastWinner}`}
@@ -102,9 +102,9 @@ export default function WinnerCard() {
           <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">
             Recent Winners ({allWinners.length})
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[300px] md:max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
             {allWinners.length > 0 ? (
-              allWinners.slice(0, 5).map((winner, index) => (
+              allWinners.map((winner, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-2 sm:p-3 bg-gray-900/50 border border-purple-500/20 rounded-lg hover:border-purple-500/40 transition-all gap-2"

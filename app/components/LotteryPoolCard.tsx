@@ -1,48 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useLotteryData } from "../contexts/LotteryContext";
+import PlayersList from "./PlayersList";
 
 export default function LotteryPoolCard() {
-  const { contractBalance, totalPlayers, lastTimeStamp, interval, isLoading } =
-    useLotteryData();
-  const [nextDrawIn, setNextDrawIn] = useState<string>("Loading...");
-
-  const calculateTimeRemaining = (
-    lastTimestamp: bigint | null,
-    intervalTime: bigint | null
-  ) => {
-    if (!lastTimestamp || !intervalTime) return "Loading...";
-
-    const now = Math.floor(Date.now() / 1000);
-    const lastTime = Number(lastTimestamp);
-    const intervalSeconds = Number(intervalTime);
-    const nextDrawTime = lastTime + intervalSeconds;
-    const secondsRemaining = Math.max(0, nextDrawTime - now);
-
-    const hours = Math.floor(secondsRemaining / 3600);
-    const minutes = Math.floor((secondsRemaining % 3600) / 60);
-    const seconds = secondsRemaining % 60;
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds}s`;
-    } else {
-      return `${seconds}s`;
-    }
-  };
-
-  // Update countdown every second
-  useEffect(() => {
-    const updateCountdown = () => {
-      setNextDrawIn(calculateTimeRemaining(lastTimeStamp, interval));
-    };
-
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
-    return () => clearInterval(timer);
-  }, [lastTimeStamp, interval]);
+  const { contractBalance, isLoading } = useLotteryData();
 
   return (
     <div className="bg-linear-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl">
@@ -82,30 +44,10 @@ export default function LotteryPoolCard() {
           )}
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          <div className="bg-gray-900/50 rounded-lg p-3 sm:p-4 border border-purple-500/20">
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="text-base sm:text-xl">👥</span>
-              <p className="text-xs text-gray-400">Total Players</p>
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-white">
-              {totalPlayers}
-            </p>
-          </div>
-
-          <div className="bg-gray-900/50 rounded-lg p-3 sm:p-4 border border-purple-500/20">
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="text-base sm:text-xl">⏱️</span>
-              <p className="text-xs text-gray-400">Next Draw</p>
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-white">
-              {nextDrawIn}
-            </p>
-          </div>
-        </div>
+        <PlayersList />
 
         {/* Additional Info */}
+
         <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 sm:p-4">
           <div className="flex items-start space-x-2 sm:space-x-3">
             <span className="text-base sm:text-xl shrink-0">ℹ️</span>
