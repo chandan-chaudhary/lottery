@@ -49,8 +49,11 @@ public/
    - Copy `.env.example` to `.env.local` and fill in your contract address and RPC URL:
    ```
    NEXT_PUBLIC_LOTTERY_CONTRACT_ADDRESS=0xYourContractAddressHere
-   NEXT_PUBLIC_SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/your-infura-key
+   NEXT_PUBLIC_SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
    NEXT_PUBLIC_NETWORK_ID=11155111
+   PRIVATE_KEY=your-private-key-here
+   ETHERSCAN_API_KEY=your-etherscan-api-key-here
+   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your-wallet-connect-project-id-here
    ```
 4. **Run the development server**
    ```bash
@@ -64,8 +67,11 @@ See `.env.example` for required variables:
 
 ```
 NEXT_PUBLIC_LOTTERY_CONTRACT_ADDRESS=0xYourContractAddressHere
-NEXT_PUBLIC_SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/your-infura-key
+NEXT_PUBLIC_SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 NEXT_PUBLIC_NETWORK_ID=11155111
+PRIVATE_KEY=your-private-key-here
+ETHERSCAN_API_KEY=your-etherscan-api-key-here
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your-wallet-connect-project-id-here
 ```
 
 ## ⚡ Smart Contract Integration
